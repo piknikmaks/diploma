@@ -1,0 +1,209 @@
+{
+  "coins": 3022674.395273233,
+  "total_earned": 7381133.395273206,
+  "timestamp": 1774658838.137402,
+  "upgrades": [
+    {
+      "id": "better_click",
+      "level": 0
+    },
+    {
+      "id": "double_click",
+      "level": 0
+    },
+    {
+      "id": "golden_touch",
+      "level": 0
+    },
+    {
+      "id": "iron_glove",
+      "level": 0
+    },
+    {
+      "id": "steel_pickaxe",
+      "level": 0
+    },
+    {
+      "id": "diamond_drill",
+      "level": 0
+    },
+    {
+      "id": "rune_hammer",
+      "level": 0
+    },
+    {
+      "id": "dynamite",
+      "level": 0
+    },
+    {
+      "id": "laser_cutter",
+      "level": 0
+    },
+    {
+      "id": "plasma_drill",
+      "level": 0
+    },
+    {
+      "id": "magic_ring",
+      "level": 0
+    },
+    {
+      "id": "heavy_excavator",
+      "level": 0
+    },
+    {
+      "id": "gravity_press",
+      "level": 0
+    },
+    {
+      "id": "quantum_arm",
+      "level": 0
+    },
+    {
+      "id": "nano_bots_click",
+      "level": 0
+    },
+    {
+      "id": "antimatter_drill",
+      "level": 0
+    },
+    {
+      "id": "mini_black_hole",
+      "level": 0
+    },
+    {
+      "id": "solar_beam",
+      "level": 0
+    },
+    {
+      "id": "meteor_strike",
+      "level": 0
+    },
+    {
+      "id": "titan_strength",
+      "level": 0
+    },
+    {
+      "id": "hyper_cutter",
+      "level": 0
+    },
+    {
+      "id": "singularity",
+      "level": 0
+    },
+    {
+      "id": "star_destroyer",
+      "level": 0
+    },
+    {
+      "id": "reality_rift",
+      "level": 0
+    },
+    {
+      "id": "god_power",
+      "level": 0
+    },
+    {
+      "id": "worker_1",
+      "level": 10
+    },
+    {
+      "id": "worker_2",
+      "level": 4
+    },
+    {
+      "id": "auto_clicker",
+      "level": 4
+    },
+    {
+      "id": "small_factory",
+      "level": 0
+    },
+    {
+      "id": "mine",
+      "level": 0
+    },
+    {
+      "id": "drilling_rig",
+      "level": 3
+    },
+    {
+      "id": "steam_golem",
+      "level": 1
+    },
+    {
+      "id": "alchemy_lab",
+      "level": 0
+    },
+    {
+      "id": "conveyor",
+      "level": 0
+    },
+    {
+      "id": "robot_plant",
+      "level": 0
+    },
+    {
+      "id": "clone_center",
+      "level": 0
+    },
+    {
+      "id": "magic_tower",
+      "level": 0
+    },
+    {
+      "id": "core_extractor",
+      "level": 0
+    },
+    {
+      "id": "orbital_station",
+      "level": 0
+    },
+    {
+      "id": "moon_base",
+      "level": 0
+    },
+    {
+      "id": "mars_colony",
+      "level": 0
+    },
+    {
+      "id": "dyson_sphere",
+      "level": 0
+    },
+    {
+      "id": "star_fleet",
+      "level": 0
+    },
+    {
+      "id": "galaxy_monopoly",
+      "level": 0
+    },
+    {
+      "id": "ai_core",
+      "level": 0
+    },
+    {
+      "id": "multiverse_portal",
+      "level": 0
+    },
+    {
+      "id": "time_machine",
+      "level": 0
+    },
+    {
+      "id": "quantum_pc",
+      "level": 0
+    },
+    {
+      "id": "matter_harvester",
+      "level": 0
+    },
+    {
+      "id": "world_creator",
+      "level": 0
+    }
+  ],
+  "sound_on": true,
+  "music_on": true
+}
