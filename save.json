@@ -1,7 +1,7 @@
 {
-  "coins": 3022674.395273233,
-  "total_earned": 7381133.395273206,
-  "timestamp": 1774658838.137402,
+  "coins": 28171.98400000026,
+  "total_earned": 270218409.07928646,
+  "timestamp": 1774983105.4307852,
   "upgrades": [
     {
       "id": "better_click",
@@ -105,11 +105,11 @@
     },
     {
       "id": "worker_1",
-      "level": 10
+      "level": 21
     },
     {
       "id": "worker_2",
-      "level": 4
+      "level": 10
     },
     {
       "id": "auto_clicker",
@@ -125,11 +125,11 @@
     },
     {
       "id": "drilling_rig",
-      "level": 3
+      "level": 0
     },
     {
       "id": "steam_golem",
-      "level": 1
+      "level": 0
     },
     {
       "id": "alchemy_lab",
@@ -205,5 +205,56 @@
     }
   ],
   "sound_on": true,
-  "music_on": true
+  "music_volume": 0.0,
+  "rebirth_count": 3,
+  "total_clicks": 1947,
+  "total_play_time": 334.66699999997354,
+  "game_completed": false,
+  "achievements": [
+    {
+      "id": "first_coin",
+      "unlocked": true,
+      "unlock_time": 1774981879.586853
+    },
+    {
+      "id": "thousandaire",
+      "unlocked": true,
+      "unlock_time": 1774981879.586853
+    },
+    {
+      "id": "millionaire",
+      "unlocked": true,
+      "unlock_time": 1774981879.586853
+    },
+    {
+      "id": "clicker_100",
+      "unlocked": true,
+      "unlock_time": 1774981897.4963915
+    },
+    {
+      "id": "clicker_1000",
+      "unlocked": true,
+      "unlock_time": 1774982067.3320498
+    },
+    {
+      "id": "clicker_10000",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "first_worker",
+      "unlocked": true,
+      "unlock_time": 1774981879.586853
+    },
+    {
+      "id": "first_rebirth",
+      "unlocked": true,
+      "unlock_time": 1774981916.7473474
+    },
+    {
+      "id": "rebirth_5",
+      "unlocked": false,
+      "unlock_time": null
+    }
+  ]
 }

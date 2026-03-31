@@ -14,11 +14,14 @@ GAME_AREA_WIDTH  = int(WINDOW_WIDTH * 0.60)
 PANEL_WIDTH      = WINDOW_WIDTH - GAME_AREA_WIDTH
 
 # ── Вкладки правої панелі ─────────────────────
-TAB_CLICK    = "click"
-TAB_WORKERS  = "workers"
-TAB_SETTINGS = "settings"
-TABS = [TAB_CLICK, TAB_WORKERS, TAB_SETTINGS]
-TAB_BAR_HEIGHT = 72
+TAB_CLICK        = "click"
+TAB_WORKERS      = "workers"
+TAB_REBIRTH      = "rebirth"
+TAB_ACHIEVEMENTS = "achievements"
+TAB_STATS        = "stats"
+TAB_SETTINGS     = "settings"
+TABS = [TAB_CLICK, TAB_WORKERS, TAB_REBIRTH, TAB_ACHIEVEMENTS, TAB_STATS, TAB_SETTINGS]
+TAB_BAR_HEIGHT = 68   # трохи менше — 6 вкладок
 
 # ── Кольори — світла тема ─────────────────────
 COLOR_BG             = (220, 220, 220)
@@ -51,25 +54,194 @@ COLOR_POPUP          = (200, 140, 0)
 COLOR_TOGGLE_ON      = (80,  180,  80)
 COLOR_TOGGLE_OFF     = (180, 180, 180)
 COLOR_TOGGLE_KNOB    = (255, 255, 255)
-COLOR_DELETE_BTN     = (200,  60,  60)   # червона кнопка видалення
-COLOR_DELETE_CONFIRM = (220,  30,  30)   # підтвердження (яскравіше)
+COLOR_DELETE_BTN     = (200,  60,  60)
+COLOR_DELETE_CONFIRM = (220,  30,  30)
 COLOR_DELETE_TEXT    = (255, 255, 255)
+
+# Перерождення
+COLOR_REBIRTH_BTN    = (140,  80, 200)   # фіолетовий
+COLOR_REBIRTH_HOVER  = (160, 100, 220)
+COLOR_REBIRTH_LOCKED = (170, 170, 185)
+COLOR_REBIRTH_TEXT   = (255, 255, 255)
+COLOR_REBIRTH_GLOW   = (180, 130, 255)
+
+# Досягнення
+COLOR_ACH_UNLOCKED   = (255, 215,   0)   # золоте
+COLOR_ACH_LOCKED     = (200, 200, 200)
+COLOR_ACH_BORDER_ON  = (200, 160,   0)
+COLOR_ACH_BORDER_OFF = (160, 160, 160)
 
 # ── Монета / діамант ──────────────────────────
 COIN_BASE_RADIUS    = 100
 COIN_CLICK_SCALE    = 1.07
 COIN_ANIM_SPEED     = 0.12
 COIN_GLOW_RADIUS    = 130
+# Шаблон імені файлу: coin_0.png, coin_1.png, ...
+COIN_IMAGE_TEMPLATE = "assets/images/coin_{}.png"
 
 # ── Спливаючі числа ───────────────────────────
 POPUP_LIFETIME  = 0.85
 POPUP_SPEED     = 85
 
-# ── Збереження ────────────────────────────────
-MUSIC_FILE          = "assets/sounds/music.ogg"  # змініть назву файлу тут
-MAX_CLICKS_PER_SEC  = 20        # ліміт кліків на секунду
+# ── Збереження / аудіо ────────────────────────
+MUSIC_FILE          = "assets/sounds/music.ogg"
+MAX_CLICKS_PER_SEC  = 20
 SAVE_FILE           = "save.json"
 OFFLINE_INCOME_CAP  = 4 * 60 * 60
+
+# ── Перерождення ──────────────────────────────
+REBIRTH_BASE_COST   = 10_000_000   # ціна першого перерождення
+
+# ── Досягнення ────────────────────────────────
+# condition_type: "total_earned" | "total_clicks" | "rebirths" | "upgrade_level"
+# condition_value: число або {"upgrade_id": ..., "level": ...}
+ACHIEVEMENTS = [
+    # --- БАГАТСТВО (Total Earned) ---
+    {
+        "id": "first_coin",
+        "name": "Перший крок",
+        "desc": "Заробити 100 монет",
+        "icon": "assets/images/icons/ach_coin_1.png",
+        "condition_type": "total_earned",
+        "condition_value": 100,
+    },
+    {
+        "id": "thousandaire",
+        "name": "Тисячник",
+        "desc": "Заробити 10 000 монет",
+        "icon": "assets/images/icons/ach_coin_2.png",
+        "condition_type": "total_earned",
+        "condition_value": 10_000,
+    },
+    {
+        "id": "millionaire",
+        "name": "Мільйонер",
+        "desc": "Заробити 1 000 000 монет",
+        "icon": "assets/images/icons/ach_star_1.png",
+        "condition_type": "total_earned",
+        "condition_value": 1_000_000,
+    },
+    {
+        "id": "billionaire",
+        "name": "Мільярдер",
+        "desc": "Заробити 1 000 000 000 монет",
+        "icon": "assets/images/icons/ach_star_2.png",
+        "condition_type": "total_earned",
+        "condition_value": 1_000_000_000,
+    },
+    {
+        "id": "trillionaire",
+        "name": "Трильйонер",
+        "desc": "Заробити 1 000 000 000 000 монет",
+        "icon": "assets/images/icons/ach_star_3.png",
+        "condition_type": "total_earned",
+        "condition_value": 1_000_000_000_000,
+    },
+
+    # --- КЛІКИ (Total Clicks) ---
+    {
+        "id": "clicker_100",
+        "name": "Клікер",
+        "desc": "Зробити 100 кліків",
+        "icon": "assets/images/icons/ach_click_1.png",
+        "condition_type": "total_clicks",
+        "condition_value": 100,
+    },
+    {
+        "id": "clicker_1000",
+        "name": "Невтомний",
+        "desc": "Зробити 1 000 кліків",
+        "icon": "assets/images/icons/ach_click_2.png",
+        "condition_type": "total_clicks",
+        "condition_value": 1_000,
+    },
+    {
+        "id": "clicker_10000",
+        "name": "Машина кліків",
+        "desc": "Зробити 10 000 кліків",
+        "icon": "assets/images/icons/ach_click_3.png",
+        "condition_type": "total_clicks",
+        "condition_value": 10_000,
+    },
+    {
+        "id": "click_legend",
+        "name": "Легенда кліку",
+        "desc": "Зробити 100 000 кліків",
+        "icon": "assets/images/icons/ach_click_4.png",
+        "condition_type": "total_clicks",
+        "condition_value": 100_000,
+    },
+
+    # --- КЛЮЧОВІ АПГРЕЙДИ (Specific Upgrade Level) ---
+    {
+        "id": "first_worker",
+        "name": "Перший найманець",
+        "desc": "Найміть свого першого Помічника",
+        "icon": "assets/images/icons/ach_worker.png",
+        "condition_type": "upgrade_level",
+        "condition_value": {"upgrade_id": "worker_1", "level": 1},
+    },
+    {
+        "id": "alchemist",
+        "name": "Майстер еліксирів",
+        "desc": "Побудуйте Алхімічну лабораторію",
+        "icon": "assets/images/icons/ach_alchemy.png",
+        "condition_type": "upgrade_level",
+        "condition_value": {"upgrade_id": "alchemy_lab", "level": 1},
+    },
+    {
+        "id": "space_age",
+        "name": "Космічна ера",
+        "desc": "Запустіть Орбітальну станцію",
+        "icon": "assets/images/icons/ach_space.png",
+        "condition_type": "upgrade_level",
+        "condition_value": {"upgrade_id": "orbital_station", "level": 1},
+    },
+    {
+        "id": "world_creator_ach",
+        "name": "Творець Всесвіту",
+        "desc": "Побудуйте Генератор Світів",
+        "icon": "assets/images/icons/ach_god.png",
+        "condition_type": "upgrade_level",
+        "condition_value": {"upgrade_id": "world_creator", "level": 1},
+    },
+
+    # --- ПЕРЕРОДЖЕННЯ (Rebirths) ---
+    {
+        "id": "first_rebirth",
+        "name": "Нове народження",
+        "desc": "Зробіть своє перше переродження",
+        "icon": "assets/images/icons/ach_reb_1.png",
+        "condition_type": "rebirths",
+        "condition_value": 1,
+    },
+    {
+        "id": "rebirth_5",
+        "name": "Вічний мандрівник",
+        "desc": "Переродитися 5 разів",
+        "icon": "assets/images/icons/ach_reb_2.png",
+        "condition_type": "rebirths",
+        "condition_value": 5,
+    },
+    {
+        "id": "rebirth_10",
+        "name": "Майстер сансари",
+        "desc": "Переродитися 10 разів",
+        "icon": "assets/images/icons/ach_reb_3.png",
+        "condition_type": "rebirths",
+        "condition_value": 10,
+    },
+
+    # --- ФІНАЛЬНА МЕТА (The "End" Goal) ---
+    {
+        "id": "game_completed",
+        "name": "Кінець гри?",
+        "desc": "Досягти 1 квадрильйона монет та викупити Свободу",
+        "icon": "assets/images/icons/ach_finish.png",
+        "condition_type": "total_earned",
+        "condition_value": 1_000_000_000_000_000,
+    },
+]
 
 # ── Апгрейди ──────────────────────────────────
 UPGRADES = [
