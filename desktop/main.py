@@ -2,6 +2,7 @@
 #  main.py  —  точка входу, ігровий цикл
 # ─────────────────────────────────────────────
 import sys
+import os
 import pygame
 
 from settings import (
@@ -14,6 +15,14 @@ from game      import GameState
 from save_load import save, load, delete_save
 import ui
 
+def resource_path(relative_path):
+    """ Получает абсолютный путь к ресурсам, работает для dev и для PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def init():
     pygame.init()
