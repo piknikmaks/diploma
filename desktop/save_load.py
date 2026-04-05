@@ -3,7 +3,7 @@
 # ─────────────────────────────────────────────
 import json
 import os
-from mobile.settings_mobile import SAVE_FILE
+from settings import SAVE_FILE
 
 
 def save(game_state) -> bool:

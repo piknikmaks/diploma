@@ -3,7 +3,7 @@
 # ─────────────────────────────────────────────
 import pygame, math, os, random
 
-from mobile.settings_mobile import (
+from settings import (
     WINDOW_WIDTH, WINDOW_HEIGHT,
     TOP_BAR_HEIGHT, GAME_AREA_WIDTH, PANEL_WIDTH, TAB_BAR_HEIGHT,
     TAB_CLICK, TAB_WORKERS, TAB_REBIRTH, TAB_ACHIEVEMENTS, TAB_STATS, TAB_SETTINGS, TABS,

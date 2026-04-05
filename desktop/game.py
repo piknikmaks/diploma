@@ -3,7 +3,7 @@
 # ─────────────────────────────────────────────
 import time
 import math
-from mobile.settings_mobile import (
+from settings import (
     UPGRADES, ACHIEVEMENTS,
     OFFLINE_INCOME_CAP, POPUP_LIFETIME, POPUP_SPEED,
     MAX_CLICKS_PER_SEC, REBIRTH_BASE_COST,

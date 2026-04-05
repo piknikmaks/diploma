@@ -1,11 +1,11 @@
 {
-  "coins": 0.0,
-  "total_earned": 31779068.883999415,
-  "timestamp": 1775395621.5129156,
+  "coins": 43.333999999998966,
+  "total_earned": 31779152.218001503,
+  "timestamp": 1775398805.780185,
   "upgrades": [
     {
       "id": "better_click",
-      "level": 0
+      "level": 2
     },
     {
       "id": "double_click",
@@ -105,7 +105,7 @@
     },
     {
       "id": "worker_1",
-      "level": 0
+      "level": 1
     },
     {
       "id": "worker_2",
@@ -205,10 +205,10 @@
     }
   ],
   "sound_on": true,
-  "music_volume": 0.3,
+  "music_volume": 0.0,
   "rebirth_count": 1,
-  "total_clicks": 1284,
-  "total_play_time": 659.0760000001242,
+  "total_clicks": 1305,
+  "total_play_time": 689.0810000001522,
   "game_completed": false,
   "achievements": [
     {
