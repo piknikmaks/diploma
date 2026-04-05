@@ -4,7 +4,7 @@
 import sys
 import pygame
 
-from settings import (
+from mobile.settings_mobile import (
     WINDOW_WIDTH, WINDOW_HEIGHT, FPS, WINDOW_TITLE,
     GAME_AREA_WIDTH, TOP_BAR_HEIGHT, COIN_GLOW_RADIUS,
     TAB_CLICK, TAB_WORKERS, TAB_REBIRTH, TAB_SETTINGS,
