@@ -140,22 +140,26 @@ def _draw_gem(surface, cx, cy, scale, rb=0):
     r_base = int(COIN_BASE_RADIUS * scale)
     cols = _glow_colors()
     gc   = cols[min(rb, len(cols)-1)]
+    
     gsurf = pygame.Surface((r_glow*2+4, r_glow*2+4), pygame.SRCALPHA)
     for i in range(6, 0, -1):
-        alpha = int(30*(i/6)); gr = r_base + int((r_glow-r_base)*(i/6))
+        alpha = int(30*(i/6))
+        gr = r_base + int((r_glow-r_base)*(i/6))
         pygame.draw.circle(gsurf, (*gc, alpha), (r_glow+2, r_glow+2), gr)
     surface.blit(gsurf, (cx-r_glow-2, cy-r_glow-2))
-    pygame.draw.circle(surface, gc, (cx,cy), r_base, 4)
+    
     gem = get_gem_image(rb)
     if gem:
         sz  = int((r_base-10)*2*scale)
         img = pygame.transform.smoothscale(gem, (sz, sz))
         surface.blit(img, img.get_rect(center=(cx,cy)))
     else:
+        pygame.draw.circle(surface, gc, (cx,cy), r_base, 4)
+        
         fallback_colors = [((80,200,240),(50,160,210)),((240,100,100),(200,60,60)),
                            ((100,220,100),(60,170,60)),((240,200,60),(200,160,20)),
                            ((60,220,240),(20,160,200)),((220,80,220),(170,40,170))]
-        c1,c2 = fallback_colors[min(rb, len(fallback_colors)-1)]
+        c1, c2 = fallback_colors[min(rb, len(fallback_colors)-1)]
         s = int(r_base*0.72)
         t = [(cx,cy-s),(cx-s*0.6,cy-s*0.15),(cx+s*0.6,cy-s*0.15)]
         b = [(cx-s*0.6,cy-s*0.15),(cx,cy+s),(cx+s*0.6,cy-s*0.15)]
@@ -190,7 +194,7 @@ def _draw_achievement_banner(surface, game):
     pygame.draw.rect(s, (255,215,0,200), (0,0,bw,bh), border_radius=10)
     pygame.draw.rect(s, (200,160,0,255), (0,0,bw,bh), 2, border_radius=10)
     surface.blit(s, (bx, by))
-    _text(surface, "🏆 Досягнення!", "smallbold", (100,70,0), bx+bw//2, by+6,  anchor="midtop")
+    _text(surface, "Досягнення!", "smallbold", (100,70,0), bx+bw//2, by+6,  anchor="midtop")
     _text(surface, ach.name,         "medbold",   (60,40,0),  bx+bw//2, by+26, anchor="midtop")
 
 # ══════════════════════════════════════════════
@@ -333,7 +337,7 @@ def _draw_rebirth(surface, px, top_y, game):
           cost_col, cx, y, anchor="midtop"); y += 26
     _text(surface, f"Дасть множник ×{int(game.rebirth_multiplier)*2}", "medium",
           COLOR_TEXT_DIM, cx, y, anchor="midtop"); y += 26
-    _text(surface, "⚠ Монети і апгрейди скинуться!", "small",
+    _text(surface, "Монети і апгрейди скинуться!", "small",
           (180,100,0), cx, y, anchor="midtop"); y += 36
 
     # кнопка перерождення
@@ -343,7 +347,7 @@ def _draw_rebirth(surface, px, top_y, game):
     hov = _rebirth_rect.collidepoint(mx, my)
     bg  = (COLOR_REBIRTH_HOVER if hov else COLOR_REBIRTH_BTN) if can else COLOR_REBIRTH_LOCKED
     _rrect(surface, bg, _rebirth_rect, r=10)
-    _text(surface, "♻ Переродитися", "large",
+    _text(surface, "Переродитися", "large",
           COLOR_REBIRTH_TEXT if can else COLOR_TEXT_LOCKED,
           _rebirth_rect.centerx, _rebirth_rect.centery, anchor="center")
     y += bh + 14
@@ -364,7 +368,7 @@ def _draw_rebirth(surface, px, top_y, game):
     if game.all_achievements_unlocked:
         pygame.draw.line(surface, COLOR_PANEL_BORDER, (px+20, y), (px+PANEL_WIDTH-20, y), 1)
         y += 12
-        _text(surface, "🏆 Всі досягнення виконано!", "smallbold",
+        _text(surface, "Всі досягнення виконано!", "smallbold",
               (140,100,0), cx, y, anchor="midtop"); y += 26
         eg_can = game.can_end_game()
         eg_cost_col = (180,130,0) if eg_can else (160,100,100)
@@ -393,7 +397,7 @@ def _draw_rebirth(surface, px, top_y, game):
             else:
                 bg2 = (190,190,190)
             _rrect(surface, bg2, _endgame_rect, r=10)
-            _text(surface, "★ Завершити гру ★", "large",
+            _text(surface, "Завершити гру", "large",
                   (60,30,0) if eg_can else COLOR_TEXT_LOCKED,
                   _endgame_rect.centerx, _endgame_rect.centery, anchor="center")
 
@@ -443,7 +447,7 @@ def _draw_achievements(surface, px, top_y, game):
         _text(surface, ach.name, "medbold", nc, tx+10, ty+10)
         _text(surface, ach.desc, "small", (200,200,200), tx+10, ty+32)
         sc = (100,220,100) if ach.unlocked else (160,100,100)
-        _text(surface, "✓ Отримано" if ach.unlocked else "🔒 Заблоковано",
+        _text(surface, "Отримано" if ach.unlocked else "Заблоковано",
               "small", sc, tx+10, ty+52)
 
 # ── Статистика ────────────────────────────────
@@ -520,7 +524,7 @@ def _draw_settings(surface, px, top_y, game):
         mx, my = pygame.mouse.get_pos()
         hov = _delete_rect.collidepoint(mx, my)
         _rrect(surface, COLOR_DELETE_CONFIRM if hov else COLOR_DELETE_BTN, _delete_rect, r=8)
-        _text(surface, "🗑  Видалити прогрес", "medbold", COLOR_DELETE_TEXT,
+        _text(surface, "Видалити прогрес", "medbold", COLOR_DELETE_TEXT,
               _delete_rect.centerx, _delete_rect.centery, anchor="center")
 
     _text(surface, "S — зберегти гру", "small", COLOR_TEXT_DIM,

@@ -148,7 +148,7 @@ class GameState:
     # ─────────────────────────────────────────
     @property
     def rebirth_cost(self):
-        return REBIRTH_BASE_COST * (2 ** self.rebirth_count)
+        return REBIRTH_BASE_COST * (4 ** self.rebirth_count)
 
     def can_rebirth(self):
         return self.coins >= self.rebirth_cost

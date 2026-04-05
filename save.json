@@ -1,7 +1,7 @@
 {
-  "coins": 28171.98400000026,
-  "total_earned": 270218409.07928646,
-  "timestamp": 1774983105.4307852,
+  "coins": 0.0,
+  "total_earned": 31779068.883999415,
+  "timestamp": 1775395517.1799884,
   "upgrades": [
     {
       "id": "better_click",
@@ -105,15 +105,15 @@
     },
     {
       "id": "worker_1",
-      "level": 21
+      "level": 0
     },
     {
       "id": "worker_2",
-      "level": 10
+      "level": 0
     },
     {
       "id": "auto_clicker",
-      "level": 4
+      "level": 0
     },
     {
       "id": "small_factory",
@@ -205,36 +205,46 @@
     }
   ],
   "sound_on": true,
-  "music_volume": 0.0,
-  "rebirth_count": 3,
-  "total_clicks": 1947,
-  "total_play_time": 334.66699999997354,
+  "music_volume": 0.3,
+  "rebirth_count": 1,
+  "total_clicks": 1284,
+  "total_play_time": 554.8080000000659,
   "game_completed": false,
   "achievements": [
     {
       "id": "first_coin",
       "unlocked": true,
-      "unlock_time": 1774981879.586853
+      "unlock_time": 1775394969.9938204
     },
     {
       "id": "thousandaire",
       "unlocked": true,
-      "unlock_time": 1774981879.586853
+      "unlock_time": 1775395433.344911
     },
     {
       "id": "millionaire",
       "unlocked": true,
-      "unlock_time": 1774981879.586853
+      "unlock_time": 1775395461.1213372
+    },
+    {
+      "id": "billionaire",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "trillionaire",
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "clicker_100",
       "unlocked": true,
-      "unlock_time": 1774981897.4963915
+      "unlock_time": 1775395425.0271657
     },
     {
       "id": "clicker_1000",
       "unlocked": true,
-      "unlock_time": 1774982067.3320498
+      "unlock_time": 1775395477.5705097
     },
     {
       "id": "clicker_10000",
@@ -242,17 +252,47 @@
       "unlock_time": null
     },
     {
+      "id": "click_legend",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
       "id": "first_worker",
       "unlocked": true,
-      "unlock_time": 1774981879.586853
+      "unlock_time": 1775395443.1627939
+    },
+    {
+      "id": "alchemist",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "space_age",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "world_creator_ach",
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "first_rebirth",
       "unlocked": true,
-      "unlock_time": 1774981916.7473474
+      "unlock_time": 1775395494.8393793
     },
     {
       "id": "rebirth_5",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "rebirth_10",
+      "unlocked": false,
+      "unlock_time": null
+    },
+    {
+      "id": "game_completed",
       "unlocked": false,
       "unlock_time": null
     }
