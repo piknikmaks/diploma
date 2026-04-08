@@ -16,12 +16,11 @@ from save_load import save, load, delete_save
 import ui
 
 def resource_path(relative_path):
-    """ Получает абсолютный путь к ресурсам, работает для dev и для PyInstaller """
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
     return os.path.join(base_path, relative_path)
 
 def init():
@@ -37,7 +36,7 @@ def init():
 
 def start_music():
     try:
-        pygame.mixer.music.load(MUSIC_FILE)
+        pygame.mixer.music.load(resource_path(MUSIC_FILE))
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
     except Exception:
@@ -49,7 +48,7 @@ def load_sounds():
     for name, path in [("click", "assets/sounds/click.wav"),
                         ("buy",   "assets/sounds/buy.wav")]:
         try:
-            s = pygame.mixer.Sound(path)
+            s = pygame.mixer.Sound(resource_path(path))
             s.set_volume(0.4)
             sounds[name] = s
         except Exception:

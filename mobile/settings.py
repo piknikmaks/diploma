@@ -86,7 +86,6 @@ POPUP_SPEED     = 85
 # ── Збереження / аудіо ────────────────────────
 MUSIC_FILE          = "assets/sounds/music.ogg"
 MAX_CLICKS_PER_SEC  = 20
-SAVE_FILE           = "save.json"
 OFFLINE_INCOME_CAP  = 4 * 60 * 60
 
 # ── Перерождення ──────────────────────────────

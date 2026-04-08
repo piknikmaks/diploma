@@ -4,7 +4,7 @@
 # ─────────────────────────────────────────────
 import pygame
 import math
-import os
+import os, sys
 import random
 
 from settings_mobile import (
@@ -41,6 +41,13 @@ from settings_mobile import (
 W: int = 480
 H: int = 854
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    return os.path.join(base_path, relative_path)
 
 def set_screen_size(w: int, h: int):
     """Викликати одразу після pygame.display.set_mode()."""
@@ -75,19 +82,21 @@ def coin_glow() -> int:
 # ══════════════════════════════════════════════
 _fonts: dict = {}
 
+arial = resource_path("assets/fonts/arialmt.ttf")
+arialBold = resource_path("assets/fonts/arial_bolditalicmt.ttf")
 
 def init_fonts():
     """Завантажує шрифти. Розміри адаптовані під мобільний екран."""
-    _fonts["huge"]      = pygame.font.SysFont("Arial", 40, bold=True)
-    _fonts["large"]     = pygame.font.SysFont("Arial", 26, bold=True)
-    _fonts["stat"]      = pygame.font.SysFont("Arial", 22, bold=True)
-    _fonts["medium"]    = pygame.font.SysFont("Arial", 18)
-    _fonts["medbold"]   = pygame.font.SysFont("Arial", 18, bold=True)
-    _fonts["small"]     = pygame.font.SysFont("Arial", 14)
-    _fonts["smallbold"] = pygame.font.SysFont("Arial", 14, bold=True)
-    _fonts["popup"]     = pygame.font.SysFont("Arial", 22, bold=True)
-    _fonts["tab"]       = pygame.font.SysFont("Arial", 12, bold=True)
-    _fonts["victory"]   = pygame.font.SysFont("Arial", 52, bold=True)
+    _fonts["huge"]      = pygame.font.Font(arialBold, 40)
+    _fonts["large"]     = pygame.font.Font(arialBold, 26)
+    _fonts["stat"]      = pygame.font.Font(arialBold, 22)
+    _fonts["medium"]    = pygame.font.Font(arial, 18)
+    _fonts["medbold"]   = pygame.font.Font(arialBold, 18)
+    _fonts["small"]     = pygame.font.Font(arial, 14)
+    _fonts["smallbold"] = pygame.font.Font(arialBold, 14)
+    _fonts["popup"]     = pygame.font.Font(arialBold, 22)
+    _fonts["tab"]       = pygame.font.Font(arialBold, 12)
+    _fonts["victory"]   = pygame.font.Font(arialBold, 52)
 
 
 def _f(name: str) -> pygame.font.Font:
@@ -107,11 +116,11 @@ def _load_image(path: str, size=None):
     key = (path, size)
     if key in _icon_cache:
         return _icon_cache[key]
-    if not os.path.exists(path):
+    if not os.path.exists(resource_path(path)):
         _icon_cache[key] = None
         return None
     try:
-        img = pygame.image.load(path).convert_alpha()
+        img = pygame.image.load(resource_path(path)).convert_alpha()
         if size:
             img = pygame.transform.smoothscale(img, size)
         _icon_cache[key] = img

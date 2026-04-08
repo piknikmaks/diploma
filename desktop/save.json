@@ -1,7 +1,7 @@
 {
   "coins": 96.0,
   "total_earned": 16379734.48813585,
-  "timestamp": 1775407682.8309872,
+  "timestamp": 1775662057.791087,
   "upgrades": [
     {
       "id": "better_click",
@@ -208,7 +208,7 @@
   "music_volume": 0.0,
   "rebirth_count": 1,
   "total_clicks": 1054,
-  "total_play_time": 4092.663999998143,
+  "total_play_time": 4101.869999998045,
   "game_completed": false,
   "achievements": [
     {
