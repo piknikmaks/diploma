@@ -53,6 +53,7 @@ def load(game_state) -> float:
     try:
         with open(SAVE_FILE, "r", encoding="utf-8") as f:
             data = json.load(f) 
+            data = json.load(f) 
         offline_earned = game_state.from_dict(data)
         return offline_earned or 0.0
     except Exception as e:
