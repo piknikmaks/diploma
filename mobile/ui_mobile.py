@@ -4,7 +4,7 @@
 # ─────────────────────────────────────────────
 import pygame
 import math
-import os
+import os, sys
 import random
 
 from settings_mobile import (
@@ -41,6 +41,13 @@ from settings_mobile import (
 W: int = 480
 H: int = 854
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    return os.path.join(base_path, relative_path)
 
 def set_screen_size(w: int, h: int):
     """Викликати одразу після pygame.display.set_mode()."""
@@ -107,11 +114,11 @@ def _load_image(path: str, size=None):
     key = (path, size)
     if key in _icon_cache:
         return _icon_cache[key]
-    if not os.path.exists(path):
+    if not os.path.exists(resource_path(path)):
         _icon_cache[key] = None
         return None
     try:
-        img = pygame.image.load(path).convert_alpha()
+        img = pygame.image.load(resource_path(path)).convert_alpha()
         if size:
             img = pygame.transform.smoothscale(img, size)
         _icon_cache[key] = img

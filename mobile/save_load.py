@@ -3,8 +3,25 @@
 # ─────────────────────────────────────────────
 import json
 import os
+import platform
 from settings_mobile import SAVE_FILE
 
+def get_save_path():
+    home = os.path.expanduser("~")
+    
+    if platform.system() == "Windows":
+        save_dir = os.path.join(home, "Documents", "MyClickerGame")
+    elif platform.system() == "Linux" and "android" not in platform.platform().lower():
+        save_dir = os.path.join(home, "Documents", "MyClickerGame")
+    else:
+        save_dir = os.path.join(home, "saves")
+    
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+        
+    return os.path.join(save_dir, "save.json")
+
+SAVE_FILE = get_save_path()
 
 def save(game_state) -> bool:
     """
@@ -31,7 +48,7 @@ def load(game_state) -> float:
 
     try:
         with open(SAVE_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
+            data = json.load(f) 
         offline_earned = game_state.from_dict(data)
         return offline_earned or 0.0
     except Exception as e:
