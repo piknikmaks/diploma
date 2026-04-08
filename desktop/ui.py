@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────
 #  ui.py  —  весь рендеринг (pygame)
 # ─────────────────────────────────────────────
-import pygame, math, os, random
+import pygame, math, os, random, sys
 
 from settings import (
     WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -20,6 +20,14 @@ from settings import (
     COLOR_ACH_UNLOCKED, COLOR_ACH_LOCKED, COLOR_ACH_BORDER_ON, COLOR_ACH_BORDER_OFF,
     COIN_BASE_RADIUS, COIN_GLOW_RADIUS, COIN_IMAGE_TEMPLATE,
 )
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    return os.path.join(base_path, relative_path)
 
 # ══════════════════════════════════════════════
 #  Шрифти
@@ -50,9 +58,9 @@ _gem_imgs   = {}
 def _load_image(path, size=None):
     key = (path, size)
     if key in _icon_cache: return _icon_cache[key]
-    if not os.path.exists(path): _icon_cache[key] = None; return None
+    if not os.path.exists(resource_path(path)): _icon_cache[key] = None; return None
     try:
-        img = pygame.image.load(path).convert_alpha()
+        img = pygame.image.load(resource_path(path)).convert_alpha()
         if size: img = pygame.transform.smoothscale(img, size)
         _icon_cache[key] = img; return img
     except: _icon_cache[key] = None; return None

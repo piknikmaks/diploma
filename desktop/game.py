@@ -10,7 +10,6 @@ from settings import (
     COIN_CLICK_SCALE, COIN_ANIM_SPEED,
 )
 
-
 # ══════════════════════════════════════════════
 class PopupNumber:
     def __init__(self, x, y, value):

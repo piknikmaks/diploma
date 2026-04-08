@@ -1,7 +1,7 @@
 {
-  "coins": 96.0,
-  "total_earned": 16379734.48813585,
-  "timestamp": 1775561380.3656833,
+  "coins": 6.0,
+  "total_earned": 6.0,
+  "timestamp": 1775636265.3387077,
   "upgrades": [
     {
       "id": "better_click",
@@ -204,27 +204,27 @@
       "level": 0
     }
   ],
-  "sound_on": false,
-  "music_volume": 0.0,
-  "rebirth_count": 1,
-  "total_clicks": 1054,
-  "total_play_time": 4100.8809999980585,
+  "sound_on": true,
+  "music_volume": 0.3,
+  "rebirth_count": 0,
+  "total_clicks": 6,
+  "total_play_time": 17.857999999999816,
   "game_completed": false,
   "achievements": [
     {
       "id": "first_coin",
-      "unlocked": true,
-      "unlock_time": 1775402623.716941
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "thousandaire",
-      "unlocked": true,
-      "unlock_time": 1775407607.6312869
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "millionaire",
-      "unlocked": true,
-      "unlock_time": 1775407628.2599654
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "billionaire",
@@ -238,13 +238,13 @@
     },
     {
       "id": "clicker_100",
-      "unlocked": true,
-      "unlock_time": 1775407604.3009408
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "clicker_1000",
-      "unlocked": true,
-      "unlock_time": 1775407650.6125896
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "clicker_10000",
@@ -258,8 +258,8 @@
     },
     {
       "id": "first_worker",
-      "unlocked": true,
-      "unlock_time": 1775402539.7038128
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "alchemist",
@@ -278,8 +278,8 @@
     },
     {
       "id": "first_rebirth",
-      "unlocked": true,
-      "unlock_time": 1775407652.2717843
+      "unlocked": false,
+      "unlock_time": null
     },
     {
       "id": "rebirth_5",
