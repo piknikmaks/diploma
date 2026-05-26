@@ -23,33 +23,39 @@ TAB_SETTINGS     = "settings"
 TABS = [TAB_CLICK, TAB_WORKERS, TAB_REBIRTH, TAB_ACHIEVEMENTS, TAB_STATS, TAB_SETTINGS]
 TAB_BAR_HEIGHT = 68   # трохи менше — 6 вкладок
 
-# ── Кольори — світла тема ─────────────────────
-COLOR_BG             = (220, 220, 220)
-COLOR_TOP_BAR        = (245, 245, 245)
-COLOR_TOP_BAR_BORDER = (200, 200, 200)
-COLOR_PANEL_BG       = (195, 195, 195)
-COLOR_PANEL_BORDER   = (170, 170, 170)
+# ── Кольори — тема з акцентами ────────────────
+COLOR_BG             = (26,  28,  42)
+COLOR_BG_GLOW_ALPHA  = 14    # інтенсивність підсвітки за монетою
+BG_BLOB_COUNT        = 4     # кількість рухомих плям на фоні
+BG_BLOB_ALPHA        = 18    # яскравість плям
+BG_SHIMMER_ALPHA     = 12    # сила переливу всього фону
+BG_PULSE_SPEED       = 1.4   # швидкість пульсації / переливів
+COLOR_TOP_BAR        = (36,  40,  58)
+COLOR_TOP_BAR_BORDER = (55,  60,  85)
+COLOR_PANEL_BG       = (32,  35,  52)
+COLOR_PANEL_BORDER   = (60,  65,  95)
 
-COLOR_TAB_ACTIVE     = (245, 245, 245)
-COLOR_TAB_INACTIVE   = (180, 180, 180)
-COLOR_TAB_HOVER      = (210, 210, 210)
-COLOR_TAB_BORDER     = (155, 155, 155)
+COLOR_TAB_ACTIVE     = (48,  52,  78)
+COLOR_TAB_INACTIVE   = (30,  33,  50)
+COLOR_TAB_HOVER      = (42,  46,  68)
+COLOR_TAB_BORDER     = (75,  82, 120)
 
-COLOR_TEXT           = (30,  30,  30)
-COLOR_TEXT_DIM       = (110, 110, 110)
-COLOR_TEXT_LOCKED    = (160, 160, 160)
+COLOR_TEXT           = (235, 238, 250)
+COLOR_TEXT_DIM       = (140, 148, 175)
+COLOR_TEXT_LOCKED    = (95,  100, 125)
 
-COLOR_COIN_VAL       = (30,  30,  30)
-COLOR_PASSIVE        = (60, 130, 200)
-COLOR_CPC            = (100, 100, 100)
+COLOR_COIN_VAL       = (255, 215, 90)
+COLOR_PASSIVE        = (90,  200, 255)
+COLOR_CPC            = (180, 185, 210)
 
-COLOR_BTN_NORMAL     = (235, 235, 235)
-COLOR_BTN_HOVER      = (255, 255, 255)
-COLOR_BTN_LOCKED     = (210, 210, 210)
-COLOR_BTN_BORDER     = (190, 190, 190)
-COLOR_BTN_BORDER_HOV = (140, 180, 255)
+COLOR_BTN_NORMAL     = (44,  48,  72)
+COLOR_BTN_HOVER      = (58,  64,  95)
+COLOR_BTN_LOCKED     = (35,  38,  55)
+COLOR_BTN_BORDER     = (70,  78, 115)
+COLOR_BTN_BORDER_HOV = (120, 160, 255)
 
-COLOR_POPUP          = (200, 140, 0)
+COLOR_POPUP          = (255, 200, 60)
+COLOR_FALLING_COIN   = (255, 210, 70)
 
 COLOR_TOGGLE_ON      = (80,  180,  80)
 COLOR_TOGGLE_OFF     = (180, 180, 180)
@@ -73,8 +79,9 @@ COLOR_ACH_BORDER_OFF = (160, 160, 160)
 
 # ── Монета / діамант ──────────────────────────
 COIN_BASE_RADIUS    = 100
-COIN_CLICK_SCALE    = 1.07
-COIN_ANIM_SPEED     = 0.12
+COIN_CLICK_SQUASH   = 0.88   # стиснення при кліку
+COIN_ANIM_SPEED     = 0.22   # швидкість повернення до 1.0
+FALLING_COIN_COUNT  = (4, 7) # мін–макс монет за клік
 COIN_GLOW_RADIUS    = 130
 # Шаблон імені файлу: coin_0.png, coin_1.png, ...
 COIN_IMAGE_TEMPLATE = "assets/images/coin_{}.png"

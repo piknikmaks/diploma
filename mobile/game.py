@@ -3,12 +3,18 @@
 # ─────────────────────────────────────────────
 import time
 import math
+import random
 from settings_mobile import (
     UPGRADES, ACHIEVEMENTS,
     OFFLINE_INCOME_CAP, POPUP_LIFETIME, POPUP_SPEED,
     MAX_CLICKS_PER_SEC, REBIRTH_BASE_COST,
-    COIN_CLICK_SCALE, COIN_ANIM_SPEED,
+    COIN_CLICK_SQUASH, COIN_ANIM_SPEED, FALLING_COIN_COUNT,
 )
+
+COIN_GLOW_PALETTE = [
+    (110, 100, 220), (220, 100, 100), (100, 200, 100),
+    (220, 180, 50), (50, 200, 220), (220, 80, 220),
+]
 
 
 # ══════════════════════════════════════════════
@@ -21,6 +27,36 @@ class PopupNumber:
     @property
     def alpha(self):  return max(0, int(255 * (1.0 - self.elapsed / POPUP_LIFETIME)))
     def update(self, dt): self.elapsed += dt; self.y -= POPUP_SPEED * dt
+
+
+# ══════════════════════════════════════════════
+class FallingCoin:
+    def __init__(self, x, y, color):
+        self.x = float(x)
+        self.y = float(y)
+        self.vx = random.uniform(-140, 140)
+        self.vy = random.uniform(-200, -60)
+        self.color = color
+        self.size = random.uniform(7, 13)
+        self.rotation = random.uniform(0, 360)
+        self.spin = random.uniform(-420, 420)
+        self.life = random.uniform(0.55, 0.95)
+        self.max_life = self.life
+
+    @property
+    def alive(self):
+        return self.life > 0
+
+    @property
+    def alpha(self):
+        return max(0, int(255 * self.life / self.max_life))
+
+    def update(self, dt):
+        self.x += self.vx * dt
+        self.y += self.vy * dt
+        self.vy += 520 * dt
+        self.rotation += self.spin * dt
+        self.life -= dt
 
 
 # ══════════════════════════════════════════════
@@ -102,6 +138,7 @@ class GameState:
 
         # ── Спливаючі числа ──────────────────────
         self.popups = []
+        self.falling_coins: list[FallingCoin] = []
 
         # ── Анімація монети ──────────────────────
         self.coin_scale: float = 1.0
@@ -132,9 +169,19 @@ class GameState:
         earned = self.coins_per_click
         self.coins += earned; self.total_earned += earned
         self.total_clicks += 1
-        self.coin_scale = COIN_CLICK_SCALE
+        self.coin_scale = COIN_CLICK_SQUASH
         self.popups.append(PopupNumber(x, y, earned))
+        self._spawn_falling_coins(x, y)
         return True
+
+    def _coin_glow_color(self):
+        return COIN_GLOW_PALETTE[min(self.rebirth_count, len(COIN_GLOW_PALETTE) - 1)]
+
+    def _spawn_falling_coins(self, x, y):
+        color = self._coin_glow_color()
+        lo, hi = FALLING_COIN_COUNT
+        for _ in range(random.randint(lo, hi)):
+            self.falling_coins.append(FallingCoin(x, y, color))
 
     # ─────────────────────────────────────────
     def buy_upgrade(self, uid):
@@ -200,12 +247,18 @@ class GameState:
             earned = self.coins_per_sec * dt
             self.coins += earned; self.total_earned += earned
 
-        if self.coin_scale > 1.0:
-            self.coin_scale -= COIN_ANIM_SPEED
-            if self.coin_scale < 1.0: self.coin_scale = 1.0
+        if abs(self.coin_scale - 1.0) > 0.001:
+            self.coin_scale += (1.0 - self.coin_scale) * COIN_ANIM_SPEED
+            if abs(self.coin_scale - 1.0) < 0.001:
+                self.coin_scale = 1.0
 
-        for p in self.popups: p.update(dt)
+        for p in self.popups:
+            p.update(dt)
         self.popups = [p for p in self.popups if p.alive]
+
+        for c in self.falling_coins:
+            c.update(dt)
+        self.falling_coins = [c for c in self.falling_coins if c.alive]
 
         self._ach_timer += dt
         if self._ach_timer >= 0.16:

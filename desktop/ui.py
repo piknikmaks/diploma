@@ -3,6 +3,8 @@
 # ─────────────────────────────────────────────
 import pygame, math, os, random, sys
 
+import bg_effect
+
 from settings import (
     WINDOW_WIDTH, WINDOW_HEIGHT,
     TOP_BAR_HEIGHT, GAME_AREA_WIDTH, PANEL_WIDTH, TAB_BAR_HEIGHT,
@@ -19,6 +21,7 @@ from settings import (
     COLOR_REBIRTH_BTN, COLOR_REBIRTH_HOVER, COLOR_REBIRTH_LOCKED, COLOR_REBIRTH_TEXT, COLOR_REBIRTH_GLOW,
     COLOR_ACH_UNLOCKED, COLOR_ACH_LOCKED, COLOR_ACH_BORDER_ON, COLOR_ACH_BORDER_OFF,
     COIN_BASE_RADIUS, COIN_GLOW_RADIUS, COIN_IMAGE_TEMPLATE,
+    COLOR_FALLING_COIN,
 )
 
 def resource_path(relative_path):
@@ -122,12 +125,26 @@ def draw_top_bar(surface, game):
 # ══════════════════════════════════════════════
 #  Ліва зона кліку
 # ══════════════════════════════════════════════
+def _draw_falling_coins(surface, coins):
+    for c in coins:
+        coin_surf = pygame.Surface((int(c.size * 2) + 4, int(c.size * 2) + 4), pygame.SRCALPHA)
+        pygame.draw.circle(coin_surf, (*c.color, c.alpha),
+                           (coin_surf.get_width() // 2, coin_surf.get_height() // 2),
+                           max(2, int(c.size)))
+        pygame.draw.circle(coin_surf, (255, 255, 255, min(180, c.alpha)),
+                           (coin_surf.get_width() // 2, coin_surf.get_height() // 2),
+                           max(2, int(c.size)), 2)
+        rotated = pygame.transform.rotate(coin_surf, c.rotation)
+        surface.blit(rotated, rotated.get_rect(center=(int(c.x), int(c.y))))
+
+
 def draw_game_area(surface, game):
-    pygame.draw.rect(surface, COLOR_BG,
-                     (0, TOP_BAR_HEIGHT, GAME_AREA_WIDTH, WINDOW_HEIGHT - TOP_BAR_HEIGHT))
+    area = pygame.Rect(0, TOP_BAR_HEIGHT, GAME_AREA_WIDTH, WINDOW_HEIGHT - TOP_BAR_HEIGHT)
+    bg_effect.draw_animated_bg(surface, area, game.rebirth_count)
     cx = GAME_AREA_WIDTH // 2
     cy = TOP_BAR_HEIGHT + (WINDOW_HEIGHT - TOP_BAR_HEIGHT) // 2 - 20
     _draw_gem(surface, cx, cy, game.coin_scale, game.rebirth_count)
+    _draw_falling_coins(surface, game.falling_coins)
     _text(surface, "Клік!", "click_label", COLOR_TEXT_DIM,
           cx, cy + COIN_GLOW_RADIUS + 14, anchor="midtop")
     stat_y = TOP_BAR_HEIGHT + 18

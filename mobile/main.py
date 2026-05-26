@@ -1,26 +1,190 @@
 # ─────────────────────────────────────────────
-#  main_mobile.py  —  точка входу мобiльної версiї
-#
-#  Використовує спiльнi: game.py, save_load.py, settings.py
-#  Власнi: settings_mobile.py, ui_mobile.py
-#
-#  Запуск на ПК для тестування:
-#      python main_mobile.py
-#  Для Android (Buildozer) — стандартний main файл.
+#  main.py  —  точка входу мобiльної / Android версiї
 # ─────────────────────────────────────────────
-import sys, os, time
-import pygame
+from __future__ import annotations
 
-from settings_mobile import (
-    MOBILE_DEFAULT_W, MOBILE_DEFAULT_H, FPS, WINDOW_TITLE,
-    TAB_HOME, TAB_CLICK, TAB_WORKERS,
-    TAB_REBIRTH, TAB_ACHIEVEMENTS, TAB_STATS, TAB_SETTINGS,
-    MUSIC_FILE,
-)
-from settings_mobile import COLOR_BG
-from game      import GameState
-from save_load import save, load, delete_save
-import ui_mobile as ui
+import sys
+import os
+import time
+import traceback
+
+# ── Android: SDL env ДО будь-якого import pygame ──
+def _is_android() -> bool:
+    return bool(
+        os.environ.get("ANDROID_ARGUMENT")
+        or os.environ.get("ANDROID_BOOTLOGO")
+        or os.environ.get("ANDROID_PRIVATE")
+    )
+
+
+def _setup_android_sdl_env():
+    if not _is_android():
+        return
+    os.environ.setdefault("SDL_AUDIODRIVER", "android")
+    os.environ.setdefault("SDL_VIDEODRIVER", "android")
+    os.environ.setdefault("SDL_ANDROID_BLOCK_ON_PAUSE", "1")
+    os.environ.setdefault("SDL_ACCELEROMETER_AS_JOYSTICK", "0")
+
+
+_setup_android_sdl_env()
+
+
+def _boot_file_log(msg: str):
+    """Запис у файл на пристрої — видно навіть якщо logcat фільтрує print."""
+    line = msg + "\n"
+    candidates = []
+    for key in ("ANDROID_PRIVATE", "ANDROID_APP_PATH"):
+        v = os.environ.get(key)
+        if v:
+            candidates.append(v)
+    candidates.append("/data/data/org.test.myclicker/files")
+    for base in candidates:
+        try:
+            if not os.path.isdir(base):
+                continue
+            with open(os.path.join(base, "clicker_boot.log"), "a", encoding="utf-8") as f:
+                f.write(line)
+            return
+        except OSError:
+            continue
+
+
+def _android_log(msg: str):
+    try:
+        from jnius import autoclass
+        autoclass("android.util.Log").i("Clicker", msg)
+    except Exception:
+        pass
+
+
+def _android_display_metrics() -> tuple[int, int, float] | None:
+    """
+    Реальна роздільність екрана в пікселях і density (1.0 = mdpi).
+    display.Info() / get_size() на Android часто повертають ~480×854.
+    """
+    try:
+        from jnius import autoclass
+        PythonActivity = autoclass("org.kivy.android.PythonActivity")
+        activity = PythonActivity.mActivity
+        if activity is None:
+            return None
+        DisplayMetrics = autoclass("android.util.DisplayMetrics")
+        metrics = DisplayMetrics()
+        activity.getWindowManager().getDefaultDisplay().getRealMetrics(metrics)
+        w = int(metrics.widthPixels)
+        h = int(metrics.heightPixels)
+        density = float(metrics.density)
+        if w > 0 and h > 0:
+            return w, h, density
+    except Exception as e:
+        _log(f"android metrics: {e}")
+    return None
+
+
+def _android_apply_display(pg, screen, metrics: tuple[int, int, float] | None):
+    """Відкриває surface на повний екран і оновлює масштаб UI."""
+    px_w, px_h, density = (0, 0, 1.0)
+    if metrics:
+        px_w, px_h, density = metrics
+
+    if px_w > 0 and px_h > 0:
+        try:
+            screen = pg.display.set_mode((px_w, px_h))
+        except Exception as e:
+            _log(f"set_mode({px_w}x{px_h}) failed: {e}")
+            try:
+                screen = pg.display.set_mode((0, 0))
+            except Exception:
+                pass
+
+    w, h = screen.get_size()
+    if metrics and w > 0 and h > 0 and w < px_w * 0.85 and px_w >= 720:
+        w, h = px_w, px_h
+
+    ui.set_screen_size(w, h, density)
+    import settings_mobile as screen_layout
+    _log(
+        f"display surface={screen.get_size()} layout={w}x{h} "
+        f"scale={screen_layout.SCALE:.2f} density={density:.2f} "
+        f"bar_h={screen_layout.RES_BAR_H}"
+    )
+    return screen
+
+
+def _log(msg: str):
+    """logcat (тег python / Clicker), файл clicker_boot.log, Android Log."""
+    text = f"[Clicker] {msg}"
+    print(text, flush=True)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    _boot_file_log(text)
+    _android_log(msg)
+
+
+_log("main.py loaded")
+
+# На Android чекаємо стабілізації Surface після splash (уникає hwui mutex crash)
+if _is_android():
+    _log("android: wait for surface")
+    time.sleep(1.0)
+
+pygame = None
+ui = None
+
+
+def _import_pygame():
+    global pygame
+    if pygame is not None:
+        return pygame
+    _log("importing pygame...")
+    import pygame as pg
+    pygame = pg
+    _log(f"pygame {pg.version.ver}")
+    if _is_android():
+        if not pg.get_init():
+            pg.init()
+        _log("pygame init (android)")
+    else:
+        try:
+            pg.mixer.pre_init(44100, -16, 2, 512)
+        except Exception as e:
+            _log(f"mixer pre_init skipped: {e}")
+        pg.init()
+    return pygame
+
+
+def _import_app_modules():
+    global ui, MOBILE_DEFAULT_W, MOBILE_DEFAULT_H, FPS, WINDOW_TITLE
+    global TAB_HOME, TAB_CLICK, TAB_WORKERS, TAB_REBIRTH
+    global TAB_ACHIEVEMENTS, TAB_STATS, TAB_SETTINGS, MUSIC_FILE, COLOR_BG
+    global GameState, save, load, delete_save
+    from settings_mobile import (
+        MOBILE_DEFAULT_W as _W,
+        MOBILE_DEFAULT_H as _H,
+        FPS as _FPS,
+        WINDOW_TITLE as _TITLE,
+        TAB_HOME as _TH,
+        TAB_CLICK as _TC,
+        TAB_WORKERS as _TW,
+        TAB_REBIRTH as _TR,
+        TAB_ACHIEVEMENTS as _TA,
+        TAB_STATS as _TS,
+        TAB_SETTINGS as _TSET,
+        MUSIC_FILE as _MUSIC,
+        COLOR_BG as _BG,
+    )
+    MOBILE_DEFAULT_W, MOBILE_DEFAULT_H = _W, _H
+    FPS, WINDOW_TITLE = _FPS, _TITLE
+    TAB_HOME, TAB_CLICK, TAB_WORKERS = _TH, _TC, _TW
+    TAB_REBIRTH, TAB_ACHIEVEMENTS = _TR, _TA
+    TAB_STATS, TAB_SETTINGS = _TS, _TSET
+    MUSIC_FILE, COLOR_BG = _MUSIC, _BG
+    from game import GameState as _GS
+    from save_load import save as _save, load as _load, delete_save as _del
+    GameState, save, load, delete_save = _GS, _save, _load, _del
+    import ui_mobile as ui_mod
+    ui = ui_mod
+    _log("modules imported")
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -30,61 +194,87 @@ def resource_path(relative_path):
     
     return os.path.join(base_path, relative_path)
 
-time.sleep(0.5)
-
 # ══════════════════════════════════════════════
 #  Iнiцiалiзацiя
 # ══════════════════════════════════════════════
-def init() -> tuple[pygame.Surface, pygame.time.Clock]:
+def init() -> tuple:
     """Iнiцiалiзує pygame, вiкно, шрифти, зображення."""
-    pygame.init()
-    pygame.mixer.init()
+    pg = _import_pygame()
+    if not _is_android():
+        try:
+            pg.mixer.init()
+        except Exception as e:
+            _log(f"mixer init skipped: {e}")
 
     # На реальному Android-пристрої set_mode((0,0)) вiдкриє повний екран.
     # На ПК — використовуємо фiксований розмiр для тестування.
+    from settings_mobile import desktop_window_size
+
+    is_android = _is_android()
+    metrics = _android_display_metrics() if is_android else None
     try:
-        info = pygame.display.Info()
-        # перевiряємо чи є реальний пристрiй (розмiр вiдрiзняється вiд стандартного)
-        if info.current_w > 0 and info.current_h > 0:
-            screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        if is_android:
+            if metrics:
+                screen = pg.display.set_mode((metrics[0], metrics[1]))
+            else:
+                screen = pg.display.set_mode((0, 0))
         else:
-            screen = pygame.display.set_mode((MOBILE_DEFAULT_W, MOBILE_DEFAULT_H))
-    except Exception:
-        screen = pygame.display.set_mode((MOBILE_DEFAULT_W, MOBILE_DEFAULT_H))
+            info = pg.display.Info()
+            ww, hh = desktop_window_size(info.current_w, info.current_h)
+            screen = pg.display.set_mode((ww, hh), pg.RESIZABLE)
+    except Exception as e:
+        _log(f"set_mode primary failed: {e}")
+        try:
+            screen = pg.display.set_mode((MOBILE_DEFAULT_W, MOBILE_DEFAULT_H))
+        except Exception:
+            screen = pg.display.set_mode((MOBILE_DEFAULT_W, MOBILE_DEFAULT_H))
 
-    pygame.display.set_caption(WINDOW_TITLE)
+    pg.display.set_caption(WINDOW_TITLE)
 
-    # передаємо реальний розмiр вiкна в ui_mobile
-    w, h = screen.get_size()
-    ui.set_screen_size(w, h)
+    if is_android:
+        screen = _android_apply_display(pg, screen, metrics)
+    else:
+        w, h = screen.get_size()
+        ui.set_screen_size(w, h)
 
-    clock = pygame.time.Clock()
-    ui.init_fonts()
-    ui.init_images()
+    clock = pg.time.Clock()
     return screen, clock
 
 
 def start_music():
     """Запускає фонову музику якщо файл iснує."""
+    pg = _import_pygame()
     try:
-        pygame.mixer.music.load(resource_path(MUSIC_FILE))
-        pygame.mixer.music.set_volume(0.3)
-        pygame.mixer.music.play(-1)
-    except Exception:
-        pass
+        if not pg.mixer.get_init():
+            pg.mixer.init()
+        pg.mixer.music.load(resource_path(MUSIC_FILE))
+        pg.mixer.music.set_volume(0.3)
+        pg.mixer.music.play(-1)
+    except Exception as e:
+        _log(f"music skipped: {e}")
 
 
 def load_sounds() -> dict:
     """Завантажує звуковi ефекти."""
+    pg = _import_pygame()
     sounds = {}
-    for name, path in [("click", "assets/sounds/click.wav"),
-                        ("buy",   "assets/sounds/buy.wav")]:
-        try:
-            s = pygame.mixer.Sound(resource_path(path))
-            s.set_volume(0.4)
-            sounds[name] = s
-        except Exception:
-            sounds[name] = None
+    sound_files = {
+        "click": ["assets/sounds/click.wav"],
+        "buy":   ["assets/sounds/buy.wav", "assets/sounds/buy.mp3"],
+    }
+    for name, paths in sound_files.items():
+        sounds[name] = None
+        for path in paths:
+            full = resource_path(path)
+            if not os.path.exists(full):
+                continue
+            try:
+                s = pg.mixer.Sound(full)
+                s.set_volume(0.4)
+                sounds[name] = s
+                break
+            except Exception as e:
+                print(f"[audio] cannot load {path}: {e}")
     return sounds
 
 
@@ -122,13 +312,13 @@ class TouchState:
         self.active     = True
         self.start_x    = x;  self.cur_x = x
         self.start_y    = y;  self.cur_y = y
-        self.start_time = pygame.time.get_ticks() / 1000.0
+        self.start_time = _import_pygame().time.get_ticks() / 1000.0
         self.duration   = 0.0
 
     def move(self, x: int, y: int):
         self.cur_x = x
         self.cur_y = y
-        self.duration = pygame.time.get_ticks() / 1000.0 - self.start_time
+        self.duration = _import_pygame().time.get_ticks() / 1000.0 - self.start_time
 
     def end(self) -> bool:
         """Повертає True якщо дотик можна вважати тапом."""
@@ -136,7 +326,8 @@ class TouchState:
         dy = abs(self.cur_y - self.start_y)
         dist = (dx * dx + dy * dy) ** 0.5
         self.active = False
-        return dist <= self.TAP_MAX_DIST and self.duration <= self.TAP_MAX_TIME
+        max_d = ui._s(self.TAP_MAX_DIST) if ui else self.TAP_MAX_DIST
+        return dist <= max_d and self.duration <= self.TAP_MAX_TIME
 
     @property
     def delta_y(self) -> float:
@@ -169,93 +360,99 @@ def finger_to_px(event, screen: pygame.Surface) -> tuple[int, int]:
 # ══════════════════════════════════════════════
 #  Обробка подiй
 # ══════════════════════════════════════════════
-def handle_events(game: GameState, sounds: dict,
+def handle_events(game, sounds: dict,
                   current_tab: str,
-                  screen: pygame.Surface) -> tuple[bool, str]:
+                  screen):
     """
     Обробляє всi подiї pygame.
-    Повертає (running, current_tab).
+    Повертає (running, current_tab, screen).
     running=False означає вихiд з гри.
     """
     global _slider_drag
+    pg = _import_pygame()
 
-    for event in pygame.event.get():
+    for event in pg.event.get():
 
         # ── Закриття вiкна ────────────────────
-        if event.type == pygame.QUIT:
+        if event.type == pg.QUIT:
             save(game)
-            return False, current_tab
+            return False, current_tab, screen
+
+        if event.type == pg.VIDEORESIZE:
+            screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
+            ui.set_screen_size(event.w, event.h)
 
         # ── Клавiатура (для тестування на ПК) ─
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_s:
                 save(game)
-            elif event.key == pygame.K_ESCAPE:
+            elif event.key == pg.K_ESCAPE:
                 save(game)
-                return False, current_tab
+                return False, current_tab, screen
 
         # ── Вiдпускання мишi / пальця (кiнець слайдера) ──
-        if event.type in (pygame.MOUSEBUTTONUP, pygame.FINGERUP):
+        if event.type in (pg.MOUSEBUTTONUP, pg.FINGERUP):
             _slider_drag = False
 
         # ─────────────────────────────────────────────────
         #  FINGER-подiї (реальний сенсорний екран)
         # ─────────────────────────────────────────────────
-        if event.type == pygame.FINGERDOWN:
+        if event.type == pg.FINGERDOWN:
             fx, fy = finger_to_px(event, screen)
             _handle_touch_begin(fx, fy, current_tab)
 
-        elif event.type == pygame.FINGERMOTION:
+        elif event.type == pg.FINGERMOTION:
             fx, fy = finger_to_px(event, screen)
             current_tab = _handle_touch_move(fx, fy, current_tab, game, sounds)
 
-        elif event.type == pygame.FINGERUP:
+        elif event.type == pg.FINGERUP:
             fx, fy = finger_to_px(event, screen)
             result = _handle_touch_end(fx, fy, current_tab, game, sounds)
             if result is False:
-                return False, current_tab
+                return False, current_tab, screen
             if result is not None:
                 current_tab = result
 
         # ─────────────────────────────────────────────────
         #  MOUSE-подiї (для тестування на ПК)
         # ─────────────────────────────────────────────────
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             mx, my = event.pos
             _handle_touch_begin(mx, my, current_tab)
+            _slider_drag = (
+                current_tab == TAB_SETTINGS and ui.is_on_slider(mx, my))
 
-        elif event.type == pygame.MOUSEMOTION:
-            if any(btn for btn in pygame.mouse.get_pressed()):
+        elif event.type == pg.MOUSEMOTION:
+            if any(btn for btn in pg.mouse.get_pressed()):
                 mx, my = event.pos
                 current_tab = _handle_touch_move(mx, my, current_tab, game, sounds)
 
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+        elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
             mx, my = event.pos
             result = _handle_touch_end(mx, my, current_tab, game, sounds)
             if result is False:
-                return False, current_tab
+                return False, current_tab, screen
             if result is not None:
                 current_tab = result
 
         # ── Скрол колесом мишi (для ПК) ──────
-        elif event.type == pygame.MOUSEWHEEL:
+        elif event.type == pg.MOUSEWHEEL:
             if current_tab in (TAB_CLICK, TAB_WORKERS):
                 typ = "click" if current_tab == TAB_CLICK else "worker"
-                ui.scroll_upgrades(typ, float(-event.y * 25))
+                ui.scroll_upgrades(typ, float(-event.y * ui._s(25)))
                 ui.clamp_upgrade_scroll(typ, game)
 
-    return True, current_tab
+    return True, current_tab, screen
 
 
 def _handle_touch_begin(x: int, y: int, current_tab: str):
     """Обробляє початок дотику: визначає в якiй зонi."""
     global _slider_drag
-    from ui_mobile import RES_BAR_H, TAB_BAR_H
-    from settings_mobile import TAB_BAR_H as _tbh
 
-    tab_bar_y = ui.H - ui.TAB_BAR_H
+    import settings_mobile as screen_layout
+    tab_bar_y = ui.H - screen_layout.TAB_BAR_H
 
-    if y < ui.RES_BAR_H:
+    if y < screen_layout.RES_BAR_H:
         # бар ресурсiв — нiчого
         pass
     elif y >= tab_bar_y:
@@ -280,7 +477,8 @@ def _handle_touch_move(x: int, y: int, current_tab: str,
     """Обробляє рух пальця: скрол списку або свайп вкладок."""
     global _slider_drag
 
-    tab_bar_y = ui.H - ui.TAB_BAR_H
+    import settings_mobile as screen_layout
+    tab_bar_y = ui.H - screen_layout.TAB_BAR_H
 
     if _slider_drag and current_tab == TAB_SETTINGS:
         # тягнемо слайдер
@@ -288,7 +486,7 @@ def _handle_touch_move(x: int, y: int, current_tab: str,
         if vol is not None:
             game.music_volume = vol
             try:
-                pygame.mixer.music.set_volume(vol)
+                _import_pygame().mixer.music.set_volume(vol)
             except Exception:
                 pass
 
@@ -321,7 +519,8 @@ def _handle_touch_end(x: int, y: int, current_tab: str,
     Якщо це тап (коротке натискання) — виконує дiю.
     Повертає новий current_tab або False (вийти) або None.
     """
-    tab_bar_y = ui.H - ui.TAB_BAR_H
+    import settings_mobile as screen_layout
+    tab_bar_y = ui.H - screen_layout.TAB_BAR_H
 
     # -- дiалог кiнця гри (поверх усього) --
     if game.show_end_dialog:
@@ -426,7 +625,7 @@ def maybe_autosave(game: GameState, dt: float):
 # ══════════════════════════════════════════════
 #  Рендеринг
 # ══════════════════════════════════════════════
-def render(screen: pygame.Surface, game: GameState, current_tab: str, dt: float):
+def render(screen, game, current_tab: str, dt: float):
     """Малює весь кадр."""
     screen.fill(COLOR_BG)
 
@@ -455,46 +654,64 @@ def render(screen: pygame.Surface, game: GameState, current_tab: str, dt: float)
     if game.end_anim_timer > 0 or game.show_end_dialog:
         ui.draw_end_animation(screen, game)
 
-    pygame.display.flip()
+    _import_pygame().display.flip()
 
 
 # ══════════════════════════════════════════════
 #  Головна функцiя
 # ══════════════════════════════════════════════
-def main():
+def _run_game():
+    _log("starting game loop")
+    _import_pygame()
+    _import_app_modules()
     screen, clock = init()
     sounds = load_sounds()
     start_music()
 
-    # завантаження збереження
     game = GameState()
     offline_earned = load(game)
     ui.show_offline_message(offline_earned, game.format_number)
 
-    # застосовуємо збережену гучнiсть
     try:
-        pygame.mixer.music.set_volume(game.music_volume)
+        _import_pygame().mixer.music.set_volume(game.music_volume)
     except Exception:
         pass
 
     current_tab = TAB_HOME
     running     = True
+    _android_layout_retries = 5 if _is_android() else 0
 
     while running:
         dt = min(clock.tick(FPS) / 1000.0, 0.1)
 
-        running, current_tab = handle_events(game, sounds, current_tab, screen)
+        if _android_layout_retries > 0:
+            _android_layout_retries -= 1
+            m = _android_display_metrics()
+            if m:
+                import settings_mobile as screen_layout
+                if screen_layout.SCALE < 1.5 or screen.get_size()[0] < 720:
+                    screen = _android_apply_display(_import_pygame(), screen, m)
+
+        running, current_tab, screen = handle_events(game, sounds, current_tab, screen)
         game.update(dt)
         maybe_autosave(game, dt)
         ui.tick_achievement_banner(game, dt)
 
-        # оновлення частинок кiнцевої анiмацiї
         if game.end_anim_timer > 0 or game.show_end_dialog:
             ui.update_end_animation(dt)
 
         render(screen, game, current_tab, dt)
 
-    pygame.quit()
+    _import_pygame().quit()
+
+
+def main():
+    try:
+        _run_game()
+    except Exception:
+        _log("FATAL: uncaught exception in main")
+        traceback.print_exc()
+        raise
     sys.exit()
 
 
